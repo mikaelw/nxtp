@@ -49,20 +49,20 @@ contract ConnextTest is ForgeHelper {
   // Fail if not called by owner
   function testAddRouterOwnable() public {
     vm.prank(address(0));
-    vm.expectRevert(bytes("#OO:029"));
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__onlyOwner_029.selector));
     connext.addRouter(address(1));
   }
 
   // Fail if adding address(0) as router
   function testAddRouterZeroAddress() public {
-    vm.expectRevert(bytes("#AR:001"));
+    vm.expectRevert(abi.encodeWithSelector(Connext.Connext__addRouter_001.selector));
     connext.addRouter(address(0));
   }
 
   // Fail if adding a duplicate router
   function testAddRouterAlreadyApproved() public {
     setApprovedRouter(address(1), true);
-    vm.expectRevert(bytes("#AR:032"));
+    vm.expectRevert(abi.encodeWithSelector(Connext.Connext__addRouter_032.selector));
     connext.addRouter(address(1));
   }
 
@@ -77,20 +77,20 @@ contract ConnextTest is ForgeHelper {
   // Fail if not called by owner
   function testRemoveRouterOwnable() public {
     vm.prank(address(0));
-    vm.expectRevert(bytes("#OO:029"));
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__onlyOwner_029.selector));
     connext.removeRouter(address(1));
   }
 
   // Fail if removing address(0) as router
   function testRemoveRouterZeroAddress() public {
-    vm.expectRevert(bytes("#RR:001"));
+    vm.expectRevert(abi.encodeWithSelector(Connext.Connext__removeRouter_001.selector));
     connext.removeRouter(address(0));
   }
 
   // Fail if removing a non-existent router
   function testAddRouterNotApproved() public {
     setApprovedRouter(address(1), false);
-    vm.expectRevert(bytes("#RR:033"));
+    vm.expectRevert(abi.encodeWithSelector(Connext.Connext__removeRouter_033.selector));
     connext.removeRouter(address(1));
   }
 
