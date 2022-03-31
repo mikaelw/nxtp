@@ -11,6 +11,91 @@ import type {
 
 const _abi = [
   {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__acceptProposedOwner_030",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__acceptProposedOwner_038",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__onlyOwner_029",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__onlyProposed_035",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__proposeAssetOwnershipRenunciation_038",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__proposeNewOwner_036",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__proposeNewOwner_038",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__proposeRouterOwnershipRenunciation_038",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__renounceAssetOwnership_030",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__renounceAssetOwnership_037",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__renounceAssetOwnership_038",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__renounceOwnership_030",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__renounceOwnership_036",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__renounceOwnership_037",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__renounceRouterOwnership_030",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__renounceRouterOwnership_037",
+    type: "error",
+  },
+  {
+    inputs: [],
+    name: "ProposedOwnableUpgradeable__renounceRouterOwnership_038",
+    type: "error",
+  },
+  {
     anonymous: false,
     inputs: [
       {
