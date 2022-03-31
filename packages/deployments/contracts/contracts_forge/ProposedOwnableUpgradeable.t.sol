@@ -21,83 +21,174 @@ contract ProposedOwnableUpgradeableTest is ForgeConnextHelper {
 
   // ============ Utils ============
 
-  // ============ owner ============
-
-  // Should work
-  function testOwner() public {
-    assertTrue(connext.owner() == admin);
+  function proposeRouterOwnershipRenunciation(uint256 timestamp) public {
+    assertTrue(!connext.renounced());
+    assertTrue(!connext.isRouterOwnershipRenounced());
+    vm.warp(timestamp);
+    vm.prank(connext.owner());
+    connext.proposeRouterOwnershipRenunciation();
+    assertTrue(connext.routerOwnershipTimestamp() == timestamp);
   }
 
-  // ============ proposed ============
+  function renounceRouterOwnership(uint256 timestamp) public {
+    proposeRouterOwnershipRenunciation(timestamp);
+    vm.warp(timestamp + connext.delay() + 1);
+    vm.prank(connext.owner());
+    connext.renounceRouterOwnership();
+    assertTrue(!connext.renounced());
+    assertTrue(connext.isRouterOwnershipRenounced());
+  }
 
-  // Should work
-  function testProposed() public {}
+  function proposeAssetOwnershipRenunciation(uint256 timestamp) public {
+    assertTrue(!connext.renounced());
+    assertTrue(!connext.isAssetOwnershipRenounced());
+    vm.warp(timestamp);
+    vm.prank(connext.owner());
+    connext.proposeAssetOwnershipRenunciation();
+    assertTrue(connext.assetOwnershipTimestamp() == timestamp);
+  }
 
-  // ============ proposedTimestamp ============
+  function renounceAssetOwnership(uint256 timestamp) public {
+    proposeAssetOwnershipRenunciation(timestamp);
+    vm.warp(timestamp + connext.delay() + 1);
+    vm.prank(connext.owner());
+    connext.renounceAssetOwnership();
+    assertTrue(!connext.renounced());
+    assertTrue(connext.isAssetOwnershipRenounced());
+  }
 
-  // Should work
-  function testProposedTimestamp() public {}
-
-  // ============ routerOwnershipTimestamp ============
-
-  // Should work
-  function testRouterOwnershipTimestamp() public {}
-
-  // ============ assetOwnershipTimestamp ============
-
-  // Should work
-  function testAssetOwnershipTimestamp() public {}
-
-  // ============ delay ============
-
-  // Should work
-  function testDelay() public {}
-
-  // ============ isRouterOwnershipRenounced ============
-
-  // Should work
-  function testIsRouterOwnershipRenounced() public {}
+  function proposeNewOwner(address newOwner, uint256 timestamp) public {
+    assertTrue(!connext.renounced());
+    vm.warp(timestamp);
+    vm.prank(admin);
+    connext.proposeNewOwner(newOwner);
+    assertTrue(connext.proposed() == newOwner);
+    assertTrue(connext.proposedTimestamp() == timestamp);
+  }
+  
+  function transferOwnership(address newOwner, uint256 timestamp) public {
+    proposeNewOwner(newOwner, timestamp);
+    vm.warp(timestamp + connext.delay() + 1);
+    if (newOwner != address(0)) {
+      vm.prank(newOwner);
+      connext.acceptProposedOwner();
+    } else {
+      vm.prank(connext.owner());
+      connext.renounceOwnership();
+      assertTrue(connext.renounced());
+    }
+    assertTrue(connext.owner() == newOwner);
+  }
 
   // ============ proposeRouterOwnershipRenunciation ============
 
+  // should fail if router ownership is already renounced
+  function testAlreadyRenouncedProposeRouterOwnershipRenunciation() public {
+    renounceRouterOwnership(123456);
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__renounceRouterOwnership_038.selector));
+    connext.renounceRouterOwnership();
+  }
+
   // Should work
-  function testProposeRouterOwnershipRenunciation() public {}
+  function testProposeRouterOwnershipRenunciation() public {
+    proposeRouterOwnershipRenunciation(123456);
+  }
 
   // ============ renounceRouterOwnership ============
 
-  // Should work
-  function testRenounceRouterOwnership() public {}
+  // should fail if router ownership is already renounced
+  function testAlreadyRenouncedRenounceRouterOwnership() public {
+    renounceRouterOwnership(123456);
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__renounceRouterOwnership_038.selector));
+    connext.renounceRouterOwnership();
+  }
 
-  // ============ isAssetOwnershipRenounced ============
+  // should fail if no proposal was made
+  function testNoProposalRenounceRouterOwnership() public {
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__renounceRouterOwnership_037.selector));
+    connext.renounceRouterOwnership();
+  }
+
+  // should fail if delay has not elapsed
+  function testNoDelayRenounceRouterOwnership() public {
+    uint256 timestamp = 123456;
+    proposeRouterOwnershipRenunciation(timestamp);
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__renounceRouterOwnership_030.selector));
+    connext.renounceRouterOwnership();
+  }
 
   // Should work
-  function testIsAssetOwnershipRenounced() public {}
+  function testRenounceRouterOwnership() public {
+    renounceRouterOwnership(12345);
+  }
 
   // ============ proposeAssetOwnershipRenunciation ============
 
+  // should fail if asset ownership already renounced
+  function testAlreadyRenouncedProposeAssetOwnershipRenunciation() public {
+    renounceAssetOwnership(123456);
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__proposeAssetOwnershipRenunciation_038.selector));
+    connext.proposeAssetOwnershipRenunciation();
+  }
+
   // Should work
-  function testProposeAssetOwnershipRenunciation() public {}
+  function testProposeAssetOwnershipRenunciation() public {
+    proposeAssetOwnershipRenunciation(12345);
+  }
 
   // ============ renounceAssetOwnership ============
 
-  // Should work
-  function testRenounceAssetOwnership() public {}
+  // should fail if asset ownership is already renounced
+  function testAlreadyRenouncedRenounceAssetOwnership() public {
+    renounceAssetOwnership(123456);
+    assertTrue(connext.isAssetOwnershipRenounced());
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__renounceAssetOwnership_038.selector));
+    connext.renounceAssetOwnership();
+  }
 
-  // ============ renounced ============
+  // should fail if no proposal was made
+  function testNoProposalRenounceAssetOwnership() public {
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__renounceAssetOwnership_037.selector));
+    connext.renounceAssetOwnership();
+  }
+
+  // should fail if delay has not elapsed
+  function testNoDelayRenounceAssetOwnership() public {
+    uint256 timestamp = 123456;
+    proposeAssetOwnershipRenunciation(timestamp);
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__renounceAssetOwnership_030.selector));
+    connext.renounceAssetOwnership();
+  }
 
   // Should work
-  function testRenounced() public {}
+  function testRenounceAssetOwnership() public {
+    renounceAssetOwnership(12345);
+  }
 
   // ============ proposeNewOwner ============
 
-  // Should fail if not proposing a new owner
+  // should fail if not called by owner
+  function testOnlyOwnerCanProposeNewOwner() public {
+    vm.expectRevert(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__onlyOwner_029.selector);
+    connext.proposeNewOwner(successor);
+  }
+
+  // should fail if proposing the owner
   function testProposeSameOwner() public {
     vm.prank(admin);
     vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__proposeNewOwner_038.selector));
     connext.proposeNewOwner(admin);
   }
 
-  // Should fail if proposing the same proposed owner
+  // should fail if proposing the same address as what is already proposed
   function testProposeDuplicateNewOwner() public {
     vm.startPrank(admin);
     connext.proposeNewOwner(successor);
@@ -108,29 +199,83 @@ contract ProposedOwnableUpgradeableTest is ForgeConnextHelper {
 
   // Should work
   function testProposeNewOwner() public {
-    uint256 timestamp = 12345;
-    vm.warp(timestamp);
-    vm.prank(admin);
-    connext.proposeNewOwner(successor);
-    assertTrue(connext.proposed() == successor);
-    assertTrue(connext.proposedTimestamp() == timestamp);
+    proposeNewOwner(successor, 123456);
   }
 
   // ============ renounceOwnership ============
 
+  // should fail if there was no proposal
+  function testNoProposalRenounceOwnership() public {
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__renounceOwnership_037.selector));
+    connext.renounceOwnership();
+  }
+
+  // should fail if the delay hasnt elapsed
+  function testNoDelayRenounceOwnership() public {
+    uint256 timestamp = 123456;
+    proposeNewOwner(address(0), timestamp);
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__renounceOwnership_030.selector));
+    connext.renounceOwnership();
+  }
+
+  // should fail if the proposed != address(0)
+  function testCorrectProposalRenounceOwnership() public {
+    uint256 timestamp = 123456;
+    proposeNewOwner(successor, timestamp);
+    vm.warp(timestamp + connext.delay() + 1);
+    vm.prank(connext.owner());
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__renounceOwnership_036.selector));
+    connext.renounceOwnership();
+  }
+
+  // should fail if not called by owner
+  function testOnlyOwnerRenounceOwnership() public {
+    uint256 timestamp = 123456;
+    proposeNewOwner(address(0), timestamp);
+    vm.warp(timestamp + connext.delay() + 1);
+    vm.prank(successor);
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__onlyOwner_029.selector));
+    connext.renounceOwnership();
+  }
+
   // Should work
-  function testRenounceOwnership() public {}
+  function testRenounceOwnership() public {
+    transferOwnership(address(0), 123456);
+  }
 
   // ============ acceptProposedOwner ============
 
-  // Should work
-  function testAcceptProposedOwner() public {
-    uint256 timestamp = 12345;
-    vm.warp(timestamp);
+  // Should fail if not called by proposed
+  function testOnlyProposedCanAccept() public {
+    uint256 timestamp = 123456;
+    proposeNewOwner(successor, timestamp);
+    vm.warp(timestamp + 8 days);
     vm.prank(admin);
-    connext.proposeNewOwner(successor);
-    vm.warp(timestamp + 7 days);
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__onlyProposed_035.selector));
+    connext.acceptProposedOwner();
+  }
+
+  // Should fail if delay has not elapsed
+  function testAcceptProposedShouldWaitForDelay() public {
+    uint256 timestamp = 123456;
+    proposeNewOwner(successor, timestamp);
+    vm.prank(successor);
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__acceptProposedOwner_030.selector));
+    connext.acceptProposedOwner();
+  }
+
+  // Should fail if there is no change in ownership
+  function testUnnecessaryAcceptProposedOwner() public {
+    transferOwnership(successor, 123456);
+    vm.expectRevert(abi.encodeWithSelector(ProposedOwnableUpgradeable.ProposedOwnableUpgradeable__acceptProposedOwner_038.selector));
     vm.prank(successor);
     connext.acceptProposedOwner();
+  }
+
+  // Should work
+  function testAcceptProposedOwner() public {
+    transferOwnership(successor, 12345);
   }
 }

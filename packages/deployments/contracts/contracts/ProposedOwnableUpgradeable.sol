@@ -268,7 +268,7 @@ abstract contract ProposedOwnableUpgradeable is Initializable {
    * Can only be called by the current owner.
    */
   function acceptProposedOwner() public virtual onlyProposed {
-    // Contract as source of truth
+    // Contract as source of truth -- don't upgrade owner if already upgraded
     if (_owner == _proposed) revert ProposedOwnableUpgradeable__acceptProposedOwner_038();
 
     // NOTE: no need to check if _proposedOwnershipTimestamp > 0 because
